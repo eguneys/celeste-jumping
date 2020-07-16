@@ -1,4 +1,4 @@
-### Making a Platformer in Pico8
+## Making a Platformer in Pico8
 
 This is an analysis of Pico8 Celeste platformer game source code. Game includes movement, collisions, jumping, wall sliding, dashing, moving platforms, pickups, linear level progression, and various platformer tricks to make it feel good. I don't discuss about music or sound making.
 
@@ -20,7 +20,114 @@ For camera, I decided to use a horizontal side scroller to add some variety to t
 
 [How Camera's work](https://www.youtube.com/watch?v=pdvCO97jOQk).
 
-Check out the [Pico 8 Basics](PICO8.md), that covers how to render tiles, debugging, code architecture. 
+Make sure to first read [Pico 8 Basics](PICO8.md), that covers how to render tiles, debugging, code architecture on Pico8.
+
+### Handling Input and Horizontal Movement
+
+Here's our `player_update` function so far:
+
+    function player_update(p)
+      local input_x
+      local input_j
+
+      if btn(⬅️) then
+         input_x = -1
+      elseif btn(➡️) then
+         input_x = 1
+      else
+         input_x = 0
+      end
+
+
+      if btn(⬆️) then
+        input_j = true
+
+
+      // h move
+      local _h_accel = 
+         input_x * h_accel
+      p.dx += _h_accel
+      p.dx += - p.dx * x_friction
+    end
+
+Apart from getting the input, we set player's `dx` property. First adding `input_x * h_accel`, `h_accel` is the horizontal acceleration multiplied by the input direction. Next we subtract `p.dx * x_friction` which slows down's the horizontal velocity and halts to zero. These formulas are explained in [this SO article](Simple Physics Based Movement). `h_accel` and `x_friction` are derived from:
+
+    t_max = 10
+    v_max = 5
+    x_friction = 5 / t_max
+    h_accel = v_max * x_friction
+
+`t_max` is the time to reach the maximum velocity,
+and `v_max` is the maximum velocity which are both tweakable parameters.
+
+Now unfortunately we only updated the player's velocity we haven't actually moved the player. Because movement involves collision detection, we will see next.
+
+### Collision Resolution while Moving the Player
+
+We are updating the player's velocity on `player_update` now we will use that to set the position in `player_move`(which is called `object_move`):
+
+    function object_move(obj)
+
+       local amount = 0
+
+       amount = flr(obj.dx + 0.5)
+
+       object_move_x(obj, amount)
+
+       // you can uncomment these to enable
+       // vertical movement
+       // amount = flr(obj.dy + 0.5)
+       // object_move_y(obj, amount)
+    end
+
+First `object_move_x` called by `obj.dx` amount, next `object_move_y` called.
+
+
+    function object_move_x(obj, 
+                           amount)
+
+       if (amount == 0) then 
+          return 
+       end
+
+       local step = sgn(amount)
+       for i=0,abs(amount) do
+          if not is_solid(obj, step, 0) then
+             obj.x += step
+          else
+             obj.dx = 0
+             break
+          end
+       end
+    end
+
+`obj.x` is increased by 1 in a for loop each time looking for a collision using `is_solid` function. Let's take a look at how it works:
+
+     function is_solid(obj, x, y)
+       local cbox = abs_cbox(obj)
+       return solid_at(cbox.x + x, 
+                       cbox.y + y,
+                       cbox.w,
+                       cbox.h)
+      end
+
+     function abs_cbox(obj)
+        local box = {
+           w=obj.cbox.w,
+           h=obj.cbox.h}
+        box.x = obj.x+obj.cbox.x
+        box.y = obj.y+obj.cbox.y
+        return box
+     end
+
+`abs_cbox` returns the object's collision box in world space. `is_solid` takes `x y` parameters that adds to the object's collision box, so `is_solid(obj, 0, 0)` looks for object's current location while `is_solid(obj, 1, 0)` looks for object's one tile right, if it's solid or not. See [the included source file](pre.p8) for full reference.
+
+If it's not solid we move by step amount and keep looping otherwise we set the velocity to 0 and break out of loop.
+
+`object_move_y` is similar, one thing to note is in `object_move_x` we look for `is_solid(obj, step, 0)` while in `object_move_y` we look for `is_solid(obj, 0, step)`.
+
+Now your character will respond to velocity updates done in `player_update` function.
+    
 
 ### Jump only on ground and Coyote Jumping
 
