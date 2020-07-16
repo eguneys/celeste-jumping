@@ -1,12 +1,13 @@
 ### Making a Platformer in Pico8
 
-This is an analysis of Pico8 Celeste platformer game source code. Game includes movement, collisions, jumping, wall sliding, dashing, moving platforms, pickups, linear level progression, and various platformer tricks to make it feel good. It doesn't include music or sound making.
+This is an analysis of Pico8 Celeste platformer game source code. Game includes movement, collisions, jumping, wall sliding, dashing, moving platforms, pickups, linear level progression, and various platformer tricks to make it feel good. I don't discuss about music or sound making.
 
 ### Hello Platformer
 
 Three main issues I encountered with making a platformer. Physics, collisions, levels, also the camera. Here's two resources about physics I used:
 
 [Simple Physics Based Movement](https://stackoverflow.com/questions/667034/simple-physics-based-movement)
+
 [Building a Better Jump](https://www.youtube.com/watch?v=hG9SzQxaCm8)
 
 These define the parameters of the movements by means of sensible values. First one finds the friction and acceleration by means of maximum velocity and time needed to reach the maximum velocity. Second one finds the gravity and initial velocity by maximum velocity, maximum jump height, maximum horizontal distance taken during the jump. It also discusses about double jumping, and variable height jumping which are basically done by changing the gravity.
@@ -19,15 +20,7 @@ For camera, I decided to use a horizontal side scroller to add some variety to t
 
 [How Camera's work](https://www.youtube.com/watch?v=pdvCO97jOQk).
 
-### Hello Pico8
-
-Here's some resources to get over the basics.
-
-[Pico8 user manual](https://www.lexaloffle.com/pico8_manual.txt)
-[Pico8 Shooter tutorial](https://ztiromoritz.github.io/pico-8-shooter/)
-[Pico8 Celeste Platformer](https://www.lexaloffle.com/bbs/?tid=2145)
-
-But don't be discouraged by Pico8 the principles applies to other engines as well.
+Check out the [Pico 8 Basics](PICO8.md), that covers how to render tiles, debugging, code architecture. 
 
 ### Jump only on ground and Coyote Jumping
 
@@ -36,9 +29,9 @@ Now the player can jump continously while in the air:
 
 To fix this, we introduce the `grace` timer, as a property on the player object.
 
-   local p = {
-      grace=0,
-      //...
+    local p = {
+       grace=0,
+       //...
 
 then, update inside `player_update`:
 
@@ -87,4 +80,4 @@ Finally apply the drag after we apply acceleration:
      p.dy += -p.dy * x_friction * v_slide_drag
 
 
-Feel free to suggest a better method, since it uses `x_friction` which is the friction for horizontal drag.
+Feel free to suggest a better method, it didn't feel very stiff enough to me, also it uses `x_friction` which is the friction for horizontal drag.
