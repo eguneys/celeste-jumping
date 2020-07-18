@@ -50,7 +50,7 @@ Here's our `player_update` function so far:
       p.dx += - p.dx * x_friction
     end
 
-Apart from getting the input, we set player's `dx` property. First adding `input_x * h_accel`, `h_accel` is the horizontal acceleration multiplied by the input direction. Next we subtract `p.dx * x_friction` which slows down's the horizontal velocity and halts to zero. These formulas are explained in [this SO article](Simple Physics Based Movement). `h_accel` and `x_friction` are derived from:
+Apart from getting the input, we set player's `dx` property. First adding `input_x * h_accel`, that is the horizontal acceleration multiplied by the input direction. Next we subtract `p.dx * x_friction` which slows down's the horizontal velocity and halts to zero. These formulas are explained in [this SO article](https://stackoverflow.com/questions/667034/simple-physics-based-movement). `h_accel` and `x_friction` are derived from:
 
     t_max = 10
     v_max = 5
@@ -60,7 +60,7 @@ Apart from getting the input, we set player's `dx` property. First adding `input
 `t_max` is the time to reach the maximum velocity,
 and `v_max` is the maximum velocity which are both tweakable parameters.
 
-Now unfortunately we only updated the player's velocity we haven't actually moved the player. Because movement involves collision detection, we will see next.
+We only updated the player's velocity we haven't actually moved the player. Because movement involves collision detection, we will see that next.
 
 ### Collision Resolution while Moving the Player
 
@@ -126,10 +126,65 @@ If it's not solid we move by step amount and keep looping otherwise we set the v
 
 `object_move_y` is similar, one thing to note is in `object_move_x` we look for `is_solid(obj, step, 0)` while in `object_move_y` we look for `is_solid(obj, 0, step)`.
 
-Now your character will respond to velocity updates done in `player_update` function.
+Now our character will respond to velocity updates done in `player_update` function.
     
 
-### Jump only on ground and Coyote Jumping
+### Jump once per ⬆️ press
+
+Let's handle input first, add this to `player_update`:
+
+     if btn(⬆️) then
+        input_j = true and not p.p_jump
+     end
+     p.p_jump = btn(⬆️)
+     if (input_j) then
+        p.j_buffer = 4
+     elseif (p.j_buffer > 0) then
+        p.j_buffer -= 1
+     end
+
+`j_buffer` property will count down 4 frames after ⬆️ is pressed, and will not update on holding jump, that means you need to release the key and press again for `j_buffer` to activate.
+
+Next actual jumping physics:
+
+     if (p.j_buffer > 0) then
+       p.ay = -g_jump
+       p.dy = -v0_jump
+     end
+
+     p.dy += p.ay
+
+When jumping we give player an initial velocity and an acceleration which is gravity. And everytime we add acceleration to the velocity. These `g_jump` and `v0_jump` values are derived as well:
+
+    v_max = 5
+    h_max = 8 * 3
+    x_sub_h = 8 * 6
+
+    v0_jump = (2 * h_max) * 
+       v_max / x_sub_h
+    g_jump = - (2 * h_max * v_max * v_max) /
+       (x_sub_h * x_sub_h)
+
+`h_max` is the maximum jump distance, in this case 3 tiles up, and `x_sub_h` is x distance covered while in the air.
+[This video](https://www.youtube.com/watch?v=hG9SzQxaCm8) explains how to derive these.
+
+Add this also to detect if we are in ground we will use it next:
+
+     local is_grounded = 
+        is_solid(p, 0, 1)
+
+When we jump we apply a gravity acceleration to our player, but if our character were to move on x axis and fall from a cliff, it wouldn't fall, let's cover that:
+
+       local g_fall = -g_jump
+       if (not is_grounded) then
+         // fall gravity
+         p.ay = g_fall
+       end
+
+I set falling gravity to `-g_jump` but it could be something else.
+
+
+### Jump only on ground and jump fall grace or "Coyote Fall"
 
 Now the player can jump continously while in the air:
 ![fail jump grace](pre_jump_fail_grace.gif)
@@ -188,3 +243,51 @@ Finally apply the drag after we apply acceleration:
 
 
 Feel free to suggest a better method, it didn't feel very stiff enough to me, also it uses `x_friction` which is the friction for horizontal drag.
+
+### Fixing a rounding bug on movement
+
+To make the wall slide slower, I multiplied `x_friction` by a factor like 1.2. This made `p.dy` to be a value less than 0.5. The player's movement stopped as `p.dy` were 0. This is a bug on our object movement code, so let's revisit that:
+
+        function object_move(obj)
+
+          local amount = 0
+
+          if not obj.remx then 
+             obj.remx = 0
+          end
+
+          obj.remx += obj.dx
+          amount = flr(obj.remx + 0.5)
+          obj.remx -= amount
+
+          object_move_x(obj, amount)
+
+          // same for y ...
+
+        end
+
+We account for remainder's so the `flr` operation doesn't lose them. Now if you multiply `x_friction` by 1.2 `p.dy` will be below 0.5 and it will slide more slower.
+
+
+### Wall Jump
+
+     // jump
+     if (p.j_buffer > 0) then
+        if (p.grace > 0) then
+            // ...
+        else
+          // wall jump
+          local wall_dir = 0
+          if is_solid(p, -3, 0) then
+             wall_dir = -1
+          elseif is_solid(p, 3, 0) then
+             wall_dir = 1
+          end
+
+          if (wall_dir != 0) then
+             p.j_buffer = 0
+             p.dy = -v0_jump
+             p.dx = -wall_dir * h_accel * 2
+          end
+
+Inside the jump code if it's not a ground jump, we check for a wall and if there is we give the player some jump velocity.
