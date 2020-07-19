@@ -28,7 +28,7 @@ Here is 3 helper functions for querying the map.
 * `tile_flag_at(x,y,w,h,flag)` returns if any tile's `flag` is set inside given area.
 * `solid_at(x,y,w,h)` returns if any solid tile is inside given area.
 
-Using these functions we can do collision detection. Refer to Celeste source code for implementations.
+Using these functions we can do collision detection. See the [included source code](pre.p8) for implementations.
 
 ### Debugging
 

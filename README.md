@@ -143,7 +143,7 @@ Let's handle input first, add this to `player_update`:
         p.j_buffer -= 1
      end
 
-`j_buffer` property will count down 4 frames after ⬆️ is pressed, and will not update on holding jump, that means you need to release the key and press again for `j_buffer` to activate.
+`j_buffer` property will count down 4 frames after ⬆️ is pressed, and will not update on holding jump, that means you need to release the key and press again for `j_buffer` to activate. It also means if you press jump 4 frames early it will still count as a jump.
 
 Next actual jumping physics:
 
@@ -183,7 +183,6 @@ When we jump we apply a gravity acceleration to our player, but if our character
 
 I set falling gravity to `-g_jump` but it could be something else.
 
-
 ### Jump only on ground and jump fall grace or "Coyote Fall"
 
 Now the player can jump continously while in the air:
@@ -218,6 +217,15 @@ This timer starts ticking down as soon as we leave the ground, (like running off
 
 Play yourself by landing on a higher floor and running off the edge, and try to jump after you have left the floor. Change the timer to 1 to notice the difference.
 
+### Variable jump height
+
+Increase the falling gravity by three times if the ⬆️ isn't pressed:
+
+    if not btn(⬆️) then
+       g_fall *= 3
+    end
+
+Player will feel heavy, you can remove this if you don't like it.
 
 ### Wall Slide
 
@@ -271,23 +279,27 @@ We account for remainder's so the `flr` operation doesn't lose them. Now if you 
 
 ### Wall Jump
 
+     local wall_dir = 0
+     if is_solid(p, -3, 0) then
+        wall_dir = -1
+     elseif is_solid(p, 3, 0) then
+        wall_dir = 1
+     end
+
      // jump
      if (p.j_buffer > 0) then
         if (p.grace > 0) then
             // ...
         else
           // wall jump
-          local wall_dir = 0
-          if is_solid(p, -3, 0) then
-             wall_dir = -1
-          elseif is_solid(p, 3, 0) then
-             wall_dir = 1
-          end
-
           if (wall_dir != 0) then
              p.j_buffer = 0
              p.dy = -v0_jump
              p.dx = -wall_dir * h_accel * 2
           end
 
-Inside the jump code if it's not a ground jump, we check for a wall and if there is we give the player some jump velocity.
+First, we check for a wall on either side, and keep the side on `wall_dir`.
+
+Inside the jump code if it's not a ground jump, if there is a wall on either side we give the player some jump velocity and a horizontal velocity on the wall's opposite direction.
+
+Next we will add some tiles, improve player sprites, and add horizontal scrolling [read here](VISUAL.md).
