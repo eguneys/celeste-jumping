@@ -302,4 +302,4 @@ First, we check for a wall on either side, and keep the side on `wall_dir`.
 
 Inside the jump code if it's not a ground jump, if there is a wall on either side we give the player some jump velocity and a horizontal velocity on the wall's opposite direction.
 
-Next we will add some tiles, improve player sprites, and add horizontal scrolling [read here](VISUAL.md).
+Make sure to check out [Animations, Camera, Scrolling](VISUAL.md), where we add some tiles, improve player sprites, and add horizontal scrolling.

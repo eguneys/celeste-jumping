@@ -44,7 +44,7 @@ Now our player is changing sprites depending on it's state.
 
 ### Horizontal Scrolling Camera
 
-[map whole](pre_map_whole.gif)
+![map whole](pre_map_whole.gif)
 
 Make a map that extends to the map editor's width.  Map editor has 8 * 16 cells, screen takes 16 cells. 1 cell is 8 pixels.
 
@@ -57,11 +57,9 @@ Make a map that extends to the map editor's width.  Map editor has 8 * 16 cells,
 
 `screen_x` is screen width, `max_x` is map's width, in pixels. `followx` is going to follow our `player.x`.
 
-   local distance = abs(followx - p.x)
-
-   local smoothing = flr((distance / 64) * 8)
-      
-   followx = appr(followx, p.x, smoothing)
+     local distance = abs(followx - p.x)
+     local smoothing = flr((distance / 64) * 8)
+     followx = appr(followx, p.x, smoothing)
 
 `appr` approaches `value` to `target` by a specified `amount`.
 
@@ -71,7 +69,7 @@ Make a map that extends to the map editor's width.  Map editor has 8 * 16 cells,
         or min(val + amount, target)
     end
 
-`followx` will slowly approach `player.x` by a smoothing factor based on `distance`. This means camera will catch up to player quicker if they are further apart, like player is on the edge of the screen.
+`followx` will slowly approach `player.x` by a smoothing factor based on `distance`. This means camera will catch up to player quicker if they are further apart, like player is on the edge of the screen, and won't move much unnecessarily if they are closer.
 
     function _draw()
        cls()
@@ -99,5 +97,20 @@ We also restrict the player movement to the map by adding this to the `player_up
       -- clamp in screen
      if p.x<-1 or p.x>max_x-7 then 
         p.x=clamp(p.x,-1,max_x - 7)
+     end
+
+Now we can move the player around the whole map while smoothly scrolling. One thing to mention is the `is_solid` method which takes into account the whole map using this helper function:
+
+     function tile_flag_at(x,y,w,h)
+        for i=max(0,flr(x/8)),
+        min(128, (x+w-1)/8) do
+           for j=max(0,flr(y/8)),
+           min(15,(y+h-1)/8) do
+              if fget(tile_at(i,j),flag) then
+                 return true
+              end
+           end
+        end
+        return false
      end
 
