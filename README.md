@@ -5,7 +5,9 @@ This is an analysis of Pico8 Celeste platformer game. Game includes movement, co
 This article is about movement, here's other articles:
 
 [Pico 8 Basics](PICO8.md)
+
 [Animations, Camera, Scrolling](VISUAL.md)
+
 [Spikes, Kill Player, Restart Level](SPIKES.md)
 
 ### Hello Platformer
@@ -419,7 +421,7 @@ Unfortunately these are some hardcoded values, tweak them to find the right feel
 
 Now the player can dash infinitely into the air:
 
-![dash movement](dash_movement.gif)
+![dash movement](pre_dash_movement.gif)
 
 To limit the player to a single dash, we introduce the `djump` variable on the player. It means how many times we can dash without touching the ground.
 
@@ -444,3 +446,5 @@ And replenish the djump when on ground:
         // ...
 
 Set the `djump` to 2 for double dashing.
+
+Next you can read [Spikes, Kill Player, Restart Level](SPIKES.md).

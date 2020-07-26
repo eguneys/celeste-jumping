@@ -75,3 +75,31 @@ In `load_room` we also destroy all the objects, which just removes them from the
 
        // rest of the function
     end
+
+`restart_room` immediately reloads the room, but we will do some animation (later) and wait a few seconds before reloading the room. 
+
+So add these variables on the `_init` function:
+
+    function _init()
+      // ...
+      delay_restart=0
+    end
+
+Then modify `restart_room` as such:
+
+    function restart_room()
+       delay_restart=15
+    end
+
+Finally inside the `_update`, check for `delay_restart` and call `load_room` when delayed restart reaches 0:
+
+    function _update()
+      if delay_restart > 0 then
+         delay_restart -= 1
+         if (delay_restart <= 0) then
+            load_room()
+         end
+      end
+      // ...
+    end
+    
