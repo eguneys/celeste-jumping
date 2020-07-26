@@ -99,7 +99,7 @@ We also restrict the player movement to the map by adding this to the `player_up
         p.x=clamp(p.x,-1,max_x - 7)
      end
 
-Now we can move the player around the whole map while smoothly scrolling. One thing to mention is the `is_solid` method which takes into account the whole map using this helper function:
+Now we can move the player around the whole map while smoothly scrolling. One thing to mention is the `is_solid` method when we do collision detection. It takes into account the whole map using this helper function:
 
      function tile_flag_at(x,y,w,h)
         for i=max(0,flr(x/8)),

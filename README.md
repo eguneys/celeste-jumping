@@ -1,6 +1,12 @@
 ## Making a Platformer in Pico8
 
-This is an analysis of Pico8 Celeste platformer game source code. Game includes movement, collisions, jumping, wall sliding, dashing, moving platforms, pickups, linear level progression, and various platformer tricks to make it feel good. I don't discuss about music or sound making.
+This is an analysis of Pico8 Celeste platformer game. Game includes movement, collisions, jumping, wall sliding, dashing, moving platforms, pickups, linear level progression, and various platformer tricks to make it feel good. I don't discuss about music or sound making.
+
+This article is about movement, here's other articles:
+
+[Pico 8 Basics](PICO8.md)
+[Animations, Camera, Scrolling](VISUAL.md)
+[Spikes, Kill Player, Restart Level](SPIKES.md)
 
 ### Hello Platformer
 
@@ -50,7 +56,7 @@ Here's our `player_update` function so far:
       p.dx += - p.dx * x_friction
     end
 
-Apart from getting the input, we set player's `dx` property. First adding `input_x * h_accel`, that is the horizontal acceleration multiplied by the input direction. Next we subtract `p.dx * x_friction` which slows down's the horizontal velocity and halts to zero. These formulas are explained in [this SO article](https://stackoverflow.com/questions/667034/simple-physics-based-movement). `h_accel` and `x_friction` are derived from:
+Apart from getting the input, we set player's `dx` property. First adding `input_x * h_accel`, that is the horizontal acceleration multiplied by the input direction. Next we subtract `p.dx * x_friction` which slows down's the horizontal velocity and halts to zero. `h_accel` and `x_friction` are derived from:
 
     t_max = 10
     v_max = 5
@@ -59,6 +65,7 @@ Apart from getting the input, we set player's `dx` property. First adding `input
 
 `t_max` is the time to reach the maximum velocity,
 and `v_max` is the maximum velocity which are both tweakable parameters.
+These formulas are explained in [this SO article](https://stackoverflow.com/questions/667034/simple-physics-based-movement).
 
 We only updated the player's velocity we haven't actually moved the player. Because movement involves collision detection, we will see that next.
 
@@ -154,7 +161,7 @@ Next actual jumping physics:
 
      p.dy += p.ay
 
-When jumping we give player an initial velocity and an acceleration which is gravity. And everytime we add acceleration to the velocity. These `g_jump` and `v0_jump` values are derived as well:
+When jumping we give player an initial velocity and an acceleration which is gravity. Acceleration is added to the velocity on each update. These `g_jump` and `v0_jump` values are derived as well:
 
     v_max = 5
     h_max = 8 * 3
@@ -302,4 +309,138 @@ First, we check for a wall on either side, and keep the side on `wall_dir`.
 
 Inside the jump code if it's not a ground jump, if there is a wall on either side we give the player some jump velocity and a horizontal velocity on the wall's opposite direction.
 
-Make sure to check out [Animations, Camera, Scrolling](VISUAL.md), where we add some tiles, improve player sprites, and add horizontal scrolling.
+Our wall jump allows player to climb by using wall jump, but in Celeste you can't reach the wall again after a wall jump to climb further. If you want that behaviour, you might try giving more `x` speed for the jump.
+
+You can read next [Animations, Camera, Scrolling](VISUAL.md), where we add some tiles, improve player sprites, and add horizontal scrolling.
+
+### Dash Movement
+
+Dashing is done by pressing the dash button ❎, and specifying a direction with the arrow keys. Player will quickly gain speed towards the specified direction.
+
+First let's handle the dash button similar to jump input:
+
+     local input_y
+     local input_d
+   
+     if btn(⬆️) then
+        input_y = -1
+     elseif btn(⬇️) then
+        input_y = 1
+     else
+        input_y = 0
+     end
+
+    if btn(❎) then
+       input_d = true and not p.p_dash
+    end
+    p.p_dash = btn(❎)
+
+`input_x` and `input_y` defines the dash direction.
+
+Define a timer in the player object `dash_time` that will indicate the time that dash lasts for.
+
+    local p = {
+       //   ...
+       dash_time=0,
+    }
+
+
+All the movement code we have done so far was normal movement. When `dash_time` is active, we will do dash movement otherwise we will do normal movement.
+
+    if (p.dash_time > 0) then
+       p.dash_time -= 1
+    else
+        // normal movement code
+
+        if input_d then
+            p.dash_time = 4
+
+          if (input_x != 0 and input_y != 0) then
+             p.dx = input_x * d_half
+             p.dy = input_y * d_half
+          elseif input_x != 0 then
+             p.dx = input_x * d_full
+             p.dy = 0
+          else
+             p.dx = 0
+             p.dy = input_y * d_full
+          end
+
+        end
+    end
+
+In normal movement if player press dash we active the `dash_time` and start dashing. We give player dash speed `d_full` in the dash direction.
+
+We will give dash acceleration and a target dash speed to the player:
+    
+     local p = {
+        //...
+       dash_target={x=0,y=0},
+       dash_accel={x=0,y=0},
+     }
+
+
+In dash movement, increase player speed upto `dash_target` by `dash_accel`.
+
+      p.dx = appr(p.dx, p.dash_target.x, p.dash_accel.x)
+      p.dy = appr(p.dy, p.dash_target.y, p.dash_accel.y)
+
+`appr(value, target, accel)` approaches `value` to `target` by `accel` amount.
+
+When starting dash, configure `dash_target` and `dash_accel` accordingly:
+
+        
+        p.dash_target.x = 2 * sign(p.dx)
+        p.dash_target.y = 2 * sign(p.dy)
+        p.dash_accel.x = 1.5
+        p.dash_accel.y = 1.5
+
+        if p.dy<0 then
+           p.dash_target.y*=.75
+        end
+        
+        if p.dy!=0 then
+           p.dash_accel.x*=0.7
+        end
+        if p.dx!=0 then
+           p.dash_accel.y*=0.7
+        end
+
+`sign` is a function that returns 0 on 0 unlike default behaviour:
+
+    function sign(v)
+       return v>0 and 1 or
+              v<0 and -1 or 0
+    end
+
+Unfortunately these are some hardcoded values, tweak them to find the right feel.
+    
+### Limit to a single Dash
+
+Now the player can dash infinitely into the air:
+
+![dash movement](dash_movement.gif)
+
+To limit the player to a single dash, we introduce the `djump` variable on the player. It means how many times we can dash without touching the ground.
+
+    local p = {
+        //...
+        djump=1
+    }
+
+Check for djump when starting a dash and decrease the djump counter inside:
+
+     if input_d and p.djump > 0 then
+
+        p.djump -= 1;
+
+        // begin dashing...
+    
+
+And replenish the djump when on ground:
+
+    if (is_grounded) then
+        p.djump = 1
+        // ...
+
+Set the `djump` to 2 for double dashing.
