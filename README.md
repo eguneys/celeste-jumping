@@ -1,6 +1,6 @@
 ## Making a Platformer in Pico8
 
-This is an analysis of Pico8 Celeste platformer game. Game includes movement, collisions, jumping, wall sliding, dashing, moving platforms, pickups, linear level progression, and various platformer tricks to make it feel good. I don't discuss about music or sound making.
+This is an analysis of Pico8 Celeste platformer game. Game includes movement, collisions, jumping, wall sliding, dashing, moving platforms, pickups, linear level progression, and various platformer tricks to make it feel good. I don't discuss about how to make art, music or sound but I will mention how to use these assets.
 
 This article is about movement, here's other articles:
 
@@ -263,7 +263,7 @@ Feel free to suggest a better method, it didn't feel very stiff enough to me, al
 
 ### Fixing a rounding bug on movement
 
-To make the wall slide slower, I multiplied `x_friction` by a factor like 1.2. This made `p.dy` to be a value less than 0.5. The player's movement stopped as `p.dy` were 0. This is a bug on our object movement code, so let's revisit that:
+To make the wall slide slower, I multiplied `x_friction` by a factor like 1.2. This made `p.dy` to be a value less than 0.5. The player's movement stopped as `flr(p.dy)` were 0. This is a bug on our object movement code, so let's revisit that:
 
         function object_move(obj)
 
@@ -447,4 +447,8 @@ And replenish the djump when on ground:
 
 Set the `djump` to 2 for double dashing.
 
-Next you can read [Spikes, Kill Player, Restart Level](SPIKES.md).
+Next you can read these
+
+[Spikes, Kill Player, Restart Level](SPIKES.md).
+
+[Adding More objects, Springs, Baloons, Falling Floors](SPRINGS.md).

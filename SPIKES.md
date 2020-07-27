@@ -102,4 +102,5 @@ Finally inside the `_update`, check for `delay_restart` and call `load_room` whe
       end
       // ...
     end
-    
+
+Next read about [Springs, Baloons, Falling Floors](SPRINGS.md).

@@ -55,7 +55,7 @@ Define a variable `DBG` and print it in draw function, set it's value to anythin
 
 The floor tiles, background tiles, spikes are all drawn using `map` and queried from the map. Other objects like player, moving platforms, falling floors, are objects with position and custom update and draw functions, put into a table.
 
-In the `_init` function we define `objects` table and call `load_map`.
+In the `_init` function we define `objects` table and call `load_room`.
 
     function _init()
        objects={}
@@ -63,9 +63,9 @@ In the `_init` function we define `objects` table and call `load_map`.
     end
 
 
-`load_map` iterates over each tile, makes a new object for tile, sets it's position and adds it to the `objects` table.
+`load_room` iterates over each tile, makes a new object for tile, sets it's position and adds it to the `objects` table.
 
-    function load_map()
+    function load_room()
        for i=1,16 do	
           for j=1,16 do
              local tile = mget(i,j)
@@ -133,4 +133,4 @@ We have added `tile=1` as a player object so `player_draw`, `player_update` and 
        spr(1,p.x,p.y)
     end
 
-`player_update` and `player_move` functions will be discussed in the [main article](README.md)
+`player_update` and `player_move` functions will be discussed in the [main article](README.md#Handling-Input-and-Horizontal-Movement)

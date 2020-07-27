@@ -114,3 +114,4 @@ Now we can move the player around the whole map while smoothly scrolling. One th
         return false
      end
 
+Next read is dash movement on [main article](README.md#Dash-Movement)
