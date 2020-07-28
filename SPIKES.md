@@ -1,3 +1,5 @@
+## Spikes, Kill Player, Restart Level
+
 ### Add Gaps and Spikes
 
 Draw 4 spike tiles facing in each direction and add them to the map at various places.

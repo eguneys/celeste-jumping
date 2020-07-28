@@ -59,7 +59,7 @@ In the `_init` function we define `objects` table and call `load_room`.
 
     function _init()
        objects={}
-       load_map()
+       load_room()
     end
 
 

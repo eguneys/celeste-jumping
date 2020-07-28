@@ -10,6 +10,8 @@ This article is about movement, here's other articles:
 
 [Spikes, Kill Player, Restart Level](SPIKES.md)
 
+[Adding More objects, Springs, Baloons, Falling Floors](SPRINGS.md).
+
 ### Hello Platformer
 
 Three main issues I encountered with making a platformer. Physics, collisions, levels, also the camera. Here's two resources about physics I used:
