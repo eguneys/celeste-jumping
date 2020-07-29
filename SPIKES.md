@@ -20,7 +20,7 @@ Add these checks after input handling on `player_update`:
 
 When player collides with spikes or goes out of screen we kill the player.
 
-`is_spike` function is similar to `is_solid` function:
+    `is_spike` function is similar to `is_solid` function (discussed in the [main article](README.md#Collision-Resolution-while-Moving-the-Player)):
 
     function is_spike(obj)
        local cbox = abs_cbox(obj)
@@ -105,4 +105,4 @@ Finally inside the `_update`, check for `delay_restart` and call `load_room` whe
       // ...
     end
 
-Next read about [Springs, Baloons, Falling Floors](SPRINGS.md).
+Next you can read about [Springs, Baloons, Falling Floors](SPRINGS.md).

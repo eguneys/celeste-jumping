@@ -16,19 +16,17 @@ This article is about movement, here's other articles:
 
 Three main issues I encountered with making a platformer. Physics, collisions, levels, also the camera. Here's two resources about physics I used:
 
-[Simple Physics Based Movement](https://stackoverflow.com/questions/667034/simple-physics-based-movement)
+[Horizontal Movement: Simple Physics Based Movement](https://stackoverflow.com/questions/667034/simple-physics-based-movement)
 
-[Building a Better Jump](https://www.youtube.com/watch?v=hG9SzQxaCm8)
+[Vertical Movement: Building a Better Jump](https://www.youtube.com/watch?v=hG9SzQxaCm8)
 
-These define the parameters of the movements by means of sensible values. First one finds the friction and acceleration by means of maximum velocity and time needed to reach the maximum velocity. Second one finds the gravity and initial velocity by maximum velocity, maximum jump height, maximum horizontal distance taken during the jump. It also discusses about double jumping, and variable height jumping which are basically done by changing the gravity.
+These define the parameters of the movements by means of sensible values. First one is horizontal movement. It finds the friction and acceleration by means of maximum velocity and time needed to reach the maximum velocity. Second one is vertical movement or jumping. It finds the gravity and initial velocity by maximum velocity, maximum jump height, maximum horizontal distance taken during the jump. It also discusses about double jumping, and variable height jumping which are basically done by changing the gravity.
 
-Collisions; I mention some of the resources that helped me  in this [question; simple collision resolution in a platformer game](https://gamedev.stackexchange.com/questions/184194/simple-collision-resolution-in-a-platformer-game). But I discarded them when I discovered [Celeste Source Code in C#](https://github.com/NoelFB/Celeste). Celeste separates X and Y axis movement, and moves the objects in small steps until they collide, in which case the collision is detected and resolved before happening. Here are some more resources that talk about Celeste: [Celeste by Game Maker's Toolkit](https://www.youtube.com/watch?v=yorTG9at90g), and [Celeste Physics by Matt Thorson](https://medium.com/@MattThorson/celeste-and-towerfall-physics-d24bd2ae0fc5).
+For collisions, I mention some of the resources that helped me  [simple collision resolution in a platformer game](https://gamedev.stackexchange.com/questions/184194/simple-collision-resolution-in-a-platformer-game). But I discarded them when I discovered [Celeste Source Code in C#](https://github.com/NoelFB/Celeste). Celeste separates X and Y axis movement, and moves the objects in small steps until they collide, in which case the collision is detected and resolved before happening. Here are some more resources that talk about Celeste: [Celeste by Game Maker's Toolkit](https://www.youtube.com/watch?v=yorTG9at90g), and [Celeste Physics by Matt Thorson](https://medium.com/@MattThorson/celeste-and-towerfall-physics-d24bd2ae0fc5).
 
 Levels are done using Pico8 map editor which I will mention how Celeste does it in this article.
 
-For camera, I decided to use a horizontal side scroller to add some variety to this research. Here's a good resource about;
-
-[How Camera's work](https://www.youtube.com/watch?v=pdvCO97jOQk).
+For camera, I decided to use a horizontal side scroller to add some variety to this research. Here's a good resource about [how Camera's work](https://www.youtube.com/watch?v=pdvCO97jOQk).
 
 Make sure to first read [Pico 8 Basics](PICO8.md), that covers how to render tiles, debugging, code architecture on Pico8.
 

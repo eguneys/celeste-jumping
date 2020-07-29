@@ -28,7 +28,7 @@ Until now we only had one player object, with properties like, `x, y`, `cbox`, `
 
 The `object_draw` function is the default drawing method. It draws the objects `spr` property to `x y` position.
 
-Remove the `player` method and just make it an object with custom properties, make sure functions like `player_update` are defined first before this definition:
+Remove the `player` method and just make it a table with custom properties, make sure functions like `player_update` are defined first before this definition:
 
     player = {
         dx=0,
@@ -73,9 +73,9 @@ Finally `init_object` in `load_room` will change, let's see how next.
 
 ### Spring jumps player into air
 
-Add two spring tiles, one for the initial state, and one for the bouncing state. Dont set any flags. Place the spring tile on the map. Because you didn't set the 2 flag it won't be drawn when using the `map` function. Spring is an object and it will have it's own draw function (it will use the default draw function).
+Add two spring tiles, one for the initial state, and one for the bouncing state. Dont set any flags. Place the spring tile on the map. Because you didn't set the flag 2, it won't be drawn when using the `map` function. Spring is an object and it will have it's own draw function (it will use the default draw function).
 
-Add a new spring object when seen a spring tile (tile 71) in `load_room`. Also note, how we init the player object:
+In `load_room`, add a new spring object when seen a spring tile (tile 71). Also note, how we init the player object:
 
      function load_room()
         for i=1,16 do	
@@ -295,13 +295,14 @@ Also objects can have `collideable` property to declare as collidable or not, we
         for i=1,count(objects) do
             other=objects[i]
 
-            if other != nil and other.type == type and other != obj and other.collideable then
+            if other != nil and other.type == type and 
+                other != obj and other.collideable then
             // .. rest of the code is the same
     end
 
 Give the `baseobject` default `collideable` property of true. Also refactor all the usages of `collide_object` to give an `x y` value of 0.
 
-The result ![pre_fall_floor_notsolid.gif]
+This is the result ![fall floor not solid](pre_fall_floor_notsolid.gif)
 
 The player doesn't stand on the fall floors but the logic works fine otherwise. We have to add the fall floors in the `is_solid` check as a solid tile.
 
@@ -314,3 +315,4 @@ The player doesn't stand on the fall floors but the logic works fine otherwise. 
             check_object(obj, fall_floor, x, y)
     end
 
+Next, you can read about [Dead particles, player spawn, smoke and sound effects](SPAWN.md)
